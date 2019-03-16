@@ -29,6 +29,7 @@
 #define TIMER0_EXTERNALCLOCK_RISING 0x07
 
 #define PWM0_WAVEFORMMODE_DISABLED 0x00
+#define PWM0_WAVEFORMMODE_CH_A_50_DUTY 0x01
 #define PWM0_WAVEFORMMODE_NORMAL 0x02
 #define PWM0_WAVEFORMMODE_INVERTED 0X03
 
@@ -39,7 +40,6 @@
 #define PWM0_OC0B_PIN_BIT 5
 #define PWM0_OC0B_PIN_PORT PORTD
 #define PWM0_OC0B_PIN_DDR DDRD
-
 
 void pwm0_begin(uint8_t PWMmode, uint8_t prescaler, uint8_t top);
 void pwm0_configurePin(uint8_t channel, uint8_t waveformMode, uint8_t dutyCycle);

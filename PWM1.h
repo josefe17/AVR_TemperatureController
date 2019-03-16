@@ -51,12 +51,9 @@
 #define PWM1_OC1B_PIN_PORT PORTB
 #define PWM1_OC1B_PIN_DDR DDRB
 
-
 void pwm1_begin(uint8_t PWMmode, uint8_t prescaler, uint16_t top);
 void pwm1_configurePin(uint8_t channel, uint8_t waveformMode, uint16_t dutyCycle);
 void pwm1_setDuty(uint8_t channel, uint16_t dutyCycle);
 void pwm1_end(void);
-
-
 
 #endif /* PWM1_H_ */

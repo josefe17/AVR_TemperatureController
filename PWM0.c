@@ -78,6 +78,12 @@ void pwm0_configurePin(uint8_t channel, uint8_t waveformMode, uint8_t dutyCycle)
 					TCCR0A = (TCCR0A & (~((1<<COM0A1) | (1<<COM0A0)))) | (1<<COM0A1) | (1<<COM0A0);
 					break;
 				}
+				case PWM0_WAVEFORMMODE_CH_A_50_DUTY:
+				{
+					PWM0_OC0A_PIN_DDR &= ~(1<<PWM0_OC0A_PIN_BIT);
+					TCCR0A = (TCCR0A & (~((1<<COM0A1) | (1<<COM0A0)))) | (1<<COM0A0);
+					break;
+				}
 				default:
 				{
 					break;
