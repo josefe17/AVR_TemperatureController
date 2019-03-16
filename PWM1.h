@@ -9,6 +9,8 @@
 #ifndef PWM1_H_
 #define PWM1_H_
 
+#include <avr/io.h>
+
 #define PWM1_CHANNEL_A 0
 #define PWM1_CHANNEL_B 1
 
@@ -41,11 +43,18 @@
 #define PWM1_WAVEFORMMODE_INVERTED 0X03
 #define PWM1_WAVEFORMMODE_CH_A_50_DUTY 0x01
 
+#define PWM1_OC1A_PIN_BIT 1
+#define PWM1_OC1A_PIN_PORT PORTB
+#define PWM1_OC1A_PIN_DDR DDRB
+
+#define PWM1_OC1B_PIN_BIT 2
+#define PWM1_OC1B_PIN_PORT PORTB
+#define PWM1_OC1B_PIN_DDR DDRB
+
+
 void pwm1_begin(uint8_t PWMmode, uint8_t prescaler, uint16_t top);
 void pwm1_configurePin(uint8_t channel, uint8_t waveformMode, uint16_t dutyCycle);
-
 void pwm1_setDuty(uint8_t channel, uint16_t dutyCycle);
-
 void pwm1_end(void);
 
 

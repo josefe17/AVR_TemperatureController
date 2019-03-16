@@ -89,11 +89,11 @@ void pwm1_begin(uint8_t PWMmode, uint8_t prescaler, uint16_t top)
 		TCNT1=0;
 		TCCR1B = (TCCR1B & (~((1<<CS12) | (1<<CS11) | (1<<CS10)))) | (prescaler & ((1<<CS12) | (1<<CS11) | (1<<CS10)));
 		//Top setting
-		if((mode == PWM1_PHASE_FREQUENCYCORRECT_ICR1) || (mode == PWM1_PHASECORRECT_ICR1) || (mode == PWM1_FASTPWM_ICR1))
+		if((PWMmode == PWM1_PHASE_FREQUENCYCORRECT_ICR1) || (PWMmode == PWM1_PHASECORRECT_ICR1) || (PWMmode == PWM1_FASTPWM_ICR1))
 		{
 			ICR1=top; //Instant update
 		}
-		if((mode == PWM1_PHASE_FREQUENCYCORRECT_OCR1A) || (mode == PWM1_PHASECORRECT_OCR1A) || (mode == PWM1_FASTPWM_OCR1A))
+		if((PWMmode == PWM1_PHASE_FREQUENCYCORRECT_OCR1A) || (PWMmode == PWM1_PHASECORRECT_OCR1A) || (PWMmode == PWM1_FASTPWM_OCR1A))
 		{
 			OCR1A=top; // On zero update
 		}
@@ -114,62 +114,24 @@ void pwm1_configurePin(uint8_t channel, uint8_t waveformMode, uint16_t dutyCycle
 				}	
 				case PWM1_WAVEFORMMODE_NORMAL:
 				{
-					DDRB|=(1<<DDB1);
+					PWM1_OC1A_PIN_DDR &= ~(1<<PWM1_OC1A_PIN_BIT);
 					TCCR1A = (TCCR1A & (~((1<<COM1A1) | (1<<COM1A0)))) | (1<<COM1A1);
 					break;
 				}
 				case PWM1_WAVEFORMMODE_INVERTED:
 				{
-					DDRB|=(1<<DDB1);
+					PWM1_OC1A_PIN_DDR &= ~(1<<PWM1_OC1A_PIN_BIT);
 					TCCR1A = (TCCR1A & (~((1<<COM1A1) | (1<<COM1A0)))) | (1<<COM1A1) | (1<<COM1A0);
 					break;					
 				}
 				case PWM1_WAVEFORMMODE_CH_A_50_DUTY:
 				{
-					DDRB|=(1<<DDB1);
+					PWM1_OC1A_PIN_DDR &= ~(1<<PWM1_OC1A_PIN_BIT);
 					TCCR1A = (TCCR1A & (~((1<<COM1A1) | (1<<COM1A0)))) | (1<<COM1A0);
 					break;
 				}
 			}
 			OCR1A=dutyCycle;
-			break;
-		}
-				case PWM1_CHANNEL_A:
-		{
-			switch (waveformMode)
-			{
-				case PWM1_WAVEFORMMODE_DISABLED:
-				{
-					TCCR1A &= ~((1<<COM1A1) | (1<<COM1A0));
-					break;
-				}	
-				case PWM1_WAVEFORMMODE_NORMAL:
-				{
-					DDRB|=(1<<DDB1);
-					TCCR1A = (TCCR1A & (~((1<<COM1A1) | (1<<COM1A0)))) | (1<<COM1A1);
-					break;
-				}
-				case PWM1_WAVEFORMMODE_INVERTED:
-				{
-					DDRB|=(1<<DDB1);
-					TCCR1A = (TCCR1A & (~((1<<COM1A1) | (1<<COM1A0)))) | (1<<COM1A1) | (1<<COM1A0);
-					break;					
-				}
-				case PWM1_WAVEFORMMODE_CH_A_50_DUTY:
-				{
-					DDRB|=(1<<DDB1);
-					TCCR1A = (TCCR1A & (~((1<<COM1A1) | (1<<COM1A0)))) | (1<<COM1A0);
-					break;
-				}
-				default:
-				{
-					break;
-				}
-			}
-			if (!((mode==PWM1_WAVEFORMMODE_CH_A_50_DUTY) || ((TCCR1A & (1<<WGM10)) && (TCCR1B & (1<<WGM13))))) // If PWM OCRA top mode enable, pin 1 cannot work as pwm
-			{
-				OCR1A = dutyCycle;
-			}
 			break;
 		}
 		case PWM1_CHANNEL_B:
@@ -183,13 +145,13 @@ void pwm1_configurePin(uint8_t channel, uint8_t waveformMode, uint16_t dutyCycle
 				}
 				case PWM1_WAVEFORMMODE_NORMAL:
 				{
-					DDRB|=(1<<DDB2);
+					PWM1_OC1B_PIN_DDR &= ~(1<<PWM1_OC1B_PIN_BIT);
 					TCCR1A = (TCCR1A & (~((1<<COM1B1) | (1<<COM1B0)))) | (1<<COM1B1);
 					break;
 				}
 				case PWM1_WAVEFORMMODE_INVERTED:
 				{
-					DDRB|=(1<<DDB2);
+					PWM1_OC1B_PIN_DDR &= ~(1<<PWM1_OC1B_PIN_BIT);
 					TCCR1A = (TCCR1A & (~((1<<COM1B1) | (1<<COM1B0)))) | (1<<COM1B1) | (1<<COM1B0);
 					break;
 				}
@@ -208,7 +170,6 @@ void pwm1_configurePin(uint8_t channel, uint8_t waveformMode, uint16_t dutyCycle
 	}
 }
 
-
 void pwm1_setDuty(uint8_t channel, uint16_t dutyCycle)
 {
 	if (channel==PWM1_CHANNEL_A && !((TCCR1A & (1<<WGM10)) && (TCCR1B & (1<<WGM13)))) // If PWM OCRA top mode enable, pin 1 cannot work as pwm
@@ -221,11 +182,12 @@ void pwm1_setDuty(uint8_t channel, uint16_t dutyCycle)
 	}
 }
 
-void end(void)
+void pwm1_end(void)
 {
 	TCCR1B=0;
 	TCCR1A=0;
 	TCNT1=0;
-	DDRB&= ~((1<<DDB1) | (1<<DDB2)); 
+	PWM1_OC1A_PIN_DDR &= ~(1<<PWM1_OC1A_PIN_BIT);
+	PWM1_OC1B_PIN_DDR &= ~(1<<PWM1_OC1B_PIN_BIT);
 }
 
